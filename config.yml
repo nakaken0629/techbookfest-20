@@ -1,14 +1,14 @@
 bookname: techbookfest-20
-booktitle: 技術書典20 新刊
-aut: ["著者名"]
-date: 2026-02-17
-history: [["2026-02-17"]]
-rights: (C) 2026 著者名
+booktitle: dbtに関するあれこれ（仮）
+aut: [{name: "岩下煕一", file-as: "イワシタキイチ"}, {name: "中垣健志", file-as: "ナカガキケンジ"}]
+date: 2026-04-22
+history: [["2026-04-11"]]
+rights: (C) 2026 DATUM STUDIO・ちゅらデータ技術書展支部
 texstyle: ["reviewmacro"]
 texdocumentclass: ["review-jsbook", "media=ebook,paper=b5"]
 language: ja
 toc: true
-# coverimage: cover.png
+coverimage: cover.png
 pdfmaker:
   colophon: true
 epubmaker:
