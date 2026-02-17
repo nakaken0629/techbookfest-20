@@ -1,0 +1,6 @@
+services:
+  review:
+    build: .
+    volumes:
+      - .:/book
+    working_dir: /book

@@ -1,0 +1,15 @@
+bookname: techbookfest-20
+booktitle: 技術書典20 新刊
+aut: ["著者名"]
+date: 2026-02-17
+history: [["2026-02-17"]]
+rights: (C) 2026 著者名
+texstyle: ["reviewmacro"]
+texdocumentclass: ["review-jsbook", "media=ebook,paper=b5"]
+language: ja
+toc: true
+# coverimage: cover.png
+pdfmaker:
+  colophon: true
+epubmaker:
+  colophon: true

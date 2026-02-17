@@ -1,0 +1,7 @@
+*.pdf
+*.epub
+webroot/
+*-pdf/
+*-epub/
+*-web/
+.DS_Store
