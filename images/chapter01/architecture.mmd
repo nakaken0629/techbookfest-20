@@ -1,0 +1,16 @@
+graph TB
+    User["ブラウザ<br/>(:8080)"]
+
+    subgraph compose["Docker Compose"]
+        Lightdash["lightdash<br/>Lightdash本体"]
+        DB["db<br/>PostgreSQL<br/>アプリDB(:5433)"]
+        DWH["dwh-db<br/>PostgreSQL<br/>データウェアハウス(:5434)"]
+        MinIO["minio<br/>MinIO<br/>オブジェクトストレージ<br/>(:9000/:9001)"]
+        MinIOInit["minio-init<br/>初期設定"]
+    end
+
+    User -->|"HTTP :8080"| Lightdash
+    Lightdash -->|"アプリデータ"| DB
+    Lightdash -->|"分析クエリ"| DWH
+    Lightdash -->|"ファイル保存"| MinIO
+    MinIOInit -->|"バケット作成"| MinIO

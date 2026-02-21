@@ -1,5 +1,7 @@
 = dbtとLightdash
 
+#@# （ここに生成した時のコミットハッシュを埋め込む）
+
 == 他のBIツールとの比較
 
 BIツールは多種多様なものが存在します。Lightdashを選ぶにあたって、代表的なBIツールであるTableau、Looker Studio、Redashとの比較を行います。
@@ -127,3 +129,182 @@ OSS版をセルフホストする場合、インフラ構築や認証、アッ�
 クラウド形態には、環境構築やアップデートが不要ですぐに使い始められること、運用負荷を抑えやすく監視や障害対応の工数を削減できること、利用者や利用量に応じてスケールしやすく拡張が容易なこと、といったメリットがあります。一方でクラウド形態は、データや接続要件によって社内規程や法令対応の確認が必要になること、機能や設定の自由度が制限され個別要件に合わせにくい場合があること、利用規模によっては継続課金が総コスト増につながることがある点に注意が必要です。
 
 本書では、ローカルPCにセルフホストという形態で、これから話を進めていきます。
+
+== Lightdashの導入
+
+本節では、サンプルソース（@<tt>{sample/utilizing-dbt-lightdash}）を使って、Lightdashをローカル環境に導入する手順を説明します。
+
+=== 前提条件
+
+本章の手順を進めるにあたって、以下の環境が用意されていることを前提とします。
+
+ * dbtプロジェクトが用意されていること
+ * Docker Desktopが導入されていること
+
+=== 構成
+
+サンプルの@<tt>{docker-compose.yml}をもとに、Lightdashを動かすために必要なコンテナ構成を説明します（@<img>{chapter01/architecture}）。
+
+//image[chapter01/architecture][構成図]{
+//}
+
+各コンテナの役割は以下の通りです。
+
+ * lightdash
+Lightdash本体です。dbtプロジェクトを読み込み、BI画面を提供します。
+
+ * db
+Lightdashがユーザーやダッシュボードなどのアプリケーション情報を保存するためのPostgreSQLデータベースです。
+
+ * dwh-db
+Lightdashが分析クエリを実行する対象となるデータウェアハウスです。本書ではPostgreSQLで代用します。dbtが変換したデータモデルはこのデータベースに格納されます。
+
+ * minio
+S3互換のオブジェクトストレージです。Lightdashはチャートのエクスポートなどにクラウドストレージを必要とするため、ローカル環境ではMinIOで代替します。
+
+ * minio-init
+MinIOのバケット作成など初期設定を行うための初期化コンテナです。起動時に一度だけ実行されます。
+
+===[column] なぜMinIOを使うのか？
+
+Lightdashはクラウドストレージ（主にAmazon S3）を、チャート画像のエクスポートやスケジュール配信などの機能に利用します。本番環境ではS3などのクラウドサービスを使えますが、ローカル開発環境ではそのまま使用できません。
+
+MinIOはS3互換のAPIを提供するオープンソースのオブジェクトストレージで、Dockerで手軽に起動できます。LightdashのS3設定にMinIOのエンドポイントを指定することで、ローカル環境でもクラウドストレージを必要とする機能を動作させることができます。
+
+===[/column]
+
+実際の@<tt>{docker-compose.yml}は以下の通りです（@<list>{docker_compose_yml}）。
+
+//list[docker_compose_yml][docker-compose.yml]{
+services:
+  db:
+    image: postgres:15.4
+    restart: always
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  dwh-db:
+    image: postgres:15.4
+    restart: always
+    environment:
+      POSTGRES_USER: ${DWH_PGUSER}
+      POSTGRES_PASSWORD: ${DWH_PGPASSWORD}
+      POSTGRES_DB: ${DWH_PGDATABASE}
+    ports:
+      - "5434:5432"
+    volumes:
+      - dwh-data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  minio-init:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3;
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb --ignore-existing local/lightdash;
+      exit 0;
+      "
+
+  lightdash:
+    image: lightdash/lightdash:latest
+    platform: linux/amd64
+    restart: always
+    depends_on:
+      - db
+      - dwh-db
+      - minio-init
+    environment:
+      PGHOST: ${PGHOST}
+      PGPORT: ${PGPORT}
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: ${PGDATABASE}
+      LIGHTDASH_SECRET: ${LIGHTDASH_SECRET}
+      SITE_URL: ${SITE_URL}
+      PORT: 8080
+      LIGHTDASH_LOG_LEVEL: debug
+      LIGHTDASH_QUERY_MAX_LIMIT: 5000
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: lightdash
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_FORCE_PATH_STYLE: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dbt_project:/usr/app/dbt
+
+volumes:
+  db-data:
+  dwh-data:
+  minio-data:
+//}
+
+=== 起動
+
+Lightdashを起動するには、まず@<tt>{docker-compose.yml}が参照する環境変数を記述した@<tt>{.env}ファイルを用意します（@<list>{env}）。
+
+//list[env][.env]{
+# Lightdash メタデータ用 PostgreSQL (db)
+PGHOST=db
+PGPORT=5432
+PGUSER=lightdash
+PGPASSWORD=lightdash_password
+PGDATABASE=lightdash
+
+# DWH用 PostgreSQL (dwh-db)
+DWH_PGHOST=dwh-db
+DWH_PGPORT=5432
+DWH_PGUSER=dbt_user
+DWH_PGPASSWORD=dbt_password
+DWH_PGDATABASE=dbt_warehouse
+
+# Lightdash
+LIGHTDASH_SECRET=this-is-a-secret-key
+SITE_URL=http://localhost:8080
+//}
+
+@<tt>{.env}を用意したら、以下のコマンドで各コンテナをバックグラウンドで起動します（@<list>{docker_compose_up}）。
+
+//list[docker_compose_up][コンテナの起動]{
+docker compose up -d
+//}
+
+起動後、@<tt>{docker compose ps}で各コンテナの状態を確認します（@<list>{docker_compose_ps}）。
+
+//list[docker_compose_ps][コンテナの状態確認]{
+docker compose ps
+//}
+
+すべてのコンテナが@<tt>{running}状態になったら、ブラウザで@<tt>{http://localhost:8080}にアクセスします。Lightdashの初期セットアップ画面が表示されれば、起動は成功です（@<img>{chapter01/lightdash_first}）。
+
+//image[chapter01/lightdash_first][Lightdashの初期画面]{
+//}
+
+作業が終わったら、以下のコマンドでコンテナを停止します（@<list>{docker_compose_down}）。
+
+//list[docker_compose_down][コンテナの停止]{
+docker compose down
+//}

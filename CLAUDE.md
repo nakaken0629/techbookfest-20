@@ -16,9 +16,22 @@
   - `//image[id][キャプション]{...//}` 画像
   - `@<list>{id}` リスト参照
   - `@<img>{id}` 画像参照
+  - `===[column] タイトル` 〜 `===[/column]` コラム（`//column` は無効）
+  - `@<tt>{text}` 等幅フォント（インラインコード）
+
+## 作図ルール
+- 図は **Mermaid** で作成すること
+- 作成した Mermaid 図は画像ファイルに変換し `images/chapterXX/` 以下に配置する
+- 原稿内での画像参照: `//image[chapterXX/ファイル名][キャプション]{//}`
 
 ## ファイル構成
 - `chapter01.re` 〜 `chapter03.re`: 各章の原稿
 - `preface.re`: まえがき
 - `postscript.re`: あとがき
 - `chapter01_toc.md` など: 各章の目次・構成メモ（Re:VIEW原稿の元になるファイル）
+
+## 章別前提
+
+### 第1章 (chapter01.re)
+- `sample/utilizing-dbt-lightdash/` 以下のソースを、この章で利用するサンプルとする
+
