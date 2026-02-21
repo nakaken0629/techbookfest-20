@@ -41,5 +41,5 @@
 ## 章別前提
 
 ### 第1章 (chapter01.re)
-- `sample/utilizing-dbt-lightdash/` 以下のソースを、この章で利用するサンプルとする
+- `https://github.com/nakaken0629/utilizing-dbt-lightdash` 以下のソースを、この章で利用するサンプルとする
 

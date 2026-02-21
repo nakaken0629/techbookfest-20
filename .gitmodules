@@ -1,3 +1,0 @@
-[submodule "sample/utilizing-dbt-lightdash"]
-	path = sample/utilizing-dbt-lightdash
-	url = https://github.com/nakaken0629/utilizing-dbt-lightdash

@@ -1,6 +1,6 @@
-= dbtとLightdash
+#@# 最後の原稿生成時のコミット: f9de55403217fe35caaebf741020ce8f8cc166a7
 
-#@# サンプルコードのコミット: f9de55403217fe35caaebf741020ce8f8cc166a7
+= dbtとLightdash
 
 == 他のBIツールとの比較
 
