@@ -41,5 +41,6 @@
 ## 章別前提
 
 ### 第1章 (chapter01.re)
-- `https://github.com/nakaken0629/utilizing-dbt-lightdash` 以下のソースを、この章で利用するサンプルとする
+- `https://github.com/nakaken0629/utilizing-dbt-lightdash` 以下のソースを、この章で利用するサンプルとする。このコンピュータ上では`../utilizing-dbt-lightdash`にクローンされているので、Git管理対象外ファイルなども含めて、サンプルとして利用する場合にはこのディレクトリを見るようにする。
+
 
