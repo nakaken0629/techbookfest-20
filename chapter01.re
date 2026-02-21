@@ -1,35 +1,121 @@
 = dbtとLightdash
 
-== Lightdashとは
+== 他のBIツールとの比較
 
-OSSのBIツールである Lightdash は、dbtプロジェクトを起点とした「モデル駆動型BI」を実現できる点に大きな特長があります。dbtで定義したモデルや指標を、そのまま分析基盤における唯一の正として扱えるため、SQLやロジックの重複を避けやすく、指標定義のブレも防ぎやすくなります。OSSとしてセルフホストでき、ベンダーロックインを回避しやすい点も魅力です。さらに、開発者向けのコード管理と、非エンジニアでも扱える探索的UIを両立しており、データチームとビジネス部門の協業を強力に支援します。
+BIツールは多種多様なものが存在します。Lightdashを選ぶにあたって、代表的なBIツールであるTableau、Looker Studio、Redashとの比較を行います。
 
-lightdashのメリットは以下の通りです。
+=== Tableau
 
- * dbtネイティブな設計
-Lightdashはdbtプロジェクトを直接読み込み、モデルやメトリクスをそのままセマンティックレイヤーとして利用します。これにより、指標定義の二重管理を避け、分析ロジックの一貫性を保てます。 [Document | Word], [lightdash.com]
+Tableauは世界的に広く利用されているBIツールです。豊富な可視化オプションと直感的なドラッグ&ドロップUIが特長で、データアナリストから経営層まで幅広いユーザーに使われています。
+
+Tableauのメリットは以下の通りです。
+
+ * 豊富な可視化オプション
+高度なグラフや地図など、多様な可視化表現が可能です。データの表現力において業界トップクラスとされています。
+
+ * 強力なデータ接続機能
+多数のデータソースへの接続に対応しており、様々なデータベースやクラウドサービスと連携できます。
+
+ * 成熟したエコシステム
+長年の実績があり、ユーザーコミュニティや学習リソースが充実しています。
+
+一方でTableauのデメリットは以下の通りです。
+
+ * ライセンスコストが高い
+プロプライエタリなソフトウェアであり、ライセンス費用が高額になることがあります。特に大規模展開ではコストが課題になります。
+
+ * dbtとの連携が限定的
+dbtのモデルや指標をそのまま利用する仕組みがなく、指標定義の二重管理が発生しやすいです。
+
+ * SQLの直接管理が難しい
+SQLロジックをGit管理しながら運用するアナリティクスエンジニアリングのワークフローとの親和性が低いです。
+
+=== Looker Studio
+
+Looker Studio（旧Google Data Studio）はGoogleが提供する無料のBIツールです。Googleサービスとの親和性が高く、Google Analytics、BigQuery、Google Sheetsなどと簡単に連携できます。
+
+Looker Studioのメリットは以下の通りです。
+
+ * 無料で利用可能
+基本機能は無料で提供されており、スモールスタートに適しています。
+
+ * Googleサービスとの連携が容易
+Google Analytics、BigQuery、Google Sheetsなど、Googleのサービスとシームレスに接続できます。
+
+ * ブラウザベースで共有しやすい
+レポートをURLで共有でき、チーム内での共有が簡単です。
+
+一方でLooker Studioのデメリットは以下の通りです。
+
+ * 機能の制限
+高度な分析や複雑なデータ変換には対応しておらず、大規模なデータ分析には不向きな場合があります。
+
+ * dbtとの連携が限定的
+Lightdashのようにdbtモデルをネイティブに読み込む機能はなく、指標の二重管理が発生します。
+
+ * パフォーマンスの問題
+大量データを扱う場合にレスポンスが遅くなることがあります。
+
+=== Redash
+
+Redashはオープンソースのデータ可視化ツールで、SQLベースのクエリ実行とダッシュボード作成を主な機能としています。エンジニアやデータアナリストに好まれるツールです。
+
+Redashのメリットは以下の通りです。
 
  * OSSでセルフホスト可能
-オープンソースとして提供されており、自社環境へのデプロイが可能です。プロプライエタリなBIツールに比べ、ベンダーロックインを回避しやすい点が評価されています。 [lightdash.com], [moge.ai]
+オープンソースであり、自社環境に構築することでコストを抑えられます。
+
+ * SQLベースで柔軟
+SQLを直接記述して分析できるため、エンジニアやデータアナリストにとって使いやすいです。
+
+ * 多様なデータソース対応
+多くのデータベースやAPIに対応しており、様々なデータソースに接続できます。
+
+一方でRedashのデメリットは以下の通りです。
+
+ * 非エンジニアには敷居が高い
+SQLの知識が必要であり、ビジネスユーザーが自分で分析するには難しい場合があります。
+
+ * dbtとの連携が限定的
+dbtモデルをセマンティックレイヤーとして活用する機能がなく、dbtとの統合が浅いです。
+
+ * メンテナンス状況の懸念
+開発の活発さが以前より低下しており、長期的なメンテナンスへの懸念があります。
+
+=== Lightdashを選ぶ理由
+
+これらのBIツールと比較すると、Lightdashは特にdbtを採用しているチームに対して強みを持ちます。dbtのモデルや指標をそのままセマンティックレイヤーとして利用できるため、指標定義の二重管理を避け、データの一貫性を保ちやすい点が最大の特長です。OSSとしてセルフホストできる点はRedashと共通しますが、dbtとの深い統合という点でLightdashが優位に立ちます。
+
+== Lightdashの概要
+
+OSSのBIツールであるLightdashは、dbtプロジェクトを起点とした「モデル駆動型BI」を実現できる点に大きな特長があります。dbtで定義したモデルや指標を、そのまま分析基盤における唯一の正として扱えるため、SQLやロジックの重複を避けやすく、指標定義のブレも防ぎやすくなります。OSSとしてセルフホストでき、ベンダーロックインを回避しやすい点も魅力です。さらに、開発者向けのコード管理と、非エンジニアでも扱える探索的UIを両立しており、データチームとビジネス部門の協業を強力に支援します。
+
+Lightdashのメリットは以下の通りです。
+
+ * dbtネイティブな設計
+Lightdashはdbtプロジェクトを直接読み込み、モデルやメトリクスをそのままセマンティックレイヤーとして利用します。これにより、指標定義の二重管理を避け、分析ロジックの一貫性を保てます。
+
+ * OSSでセルフホスト可能
+オープンソースとして提供されており、自社環境へのデプロイが可能です。プロプライエタリなBIツールに比べ、ベンダーロックインを回避しやすい点が評価されています。
 
  * Lookerライクな探索UI
-事前定義された指標を使った探索（Explore）やダッシュボード作成が可能で、SQLを書かずに分析できるUIを備えています。非エンジニアでも扱いやすい点が特長です。 [lightdash.com], [moge.ai]
+事前定義された指標を使った探索（Explore）やダッシュボード作成が可能で、SQLを書かずに分析できるUIを備えています。非エンジニアでも扱いやすい点が特長です。
 
  * 開発者フレンドリーな運用
-Gitによるバージョン管理やdbt中心のワークフローと親和性が高く、アナリティクスエンジニアリングの実践に適しています。 [datools.org]
- 
-またlightdashのデメリットは以下の通りです。
+Gitによるバージョン管理やdbt中心のワークフローと親和性が高く、アナリティクスエンジニアリングの実践に適しています。
+
+またLightdashのデメリットは以下の通りです。
 
  * dbt前提のツールである
-Lightdashはdbtを中心に設計されているため、dbtを採用していない組織では導入メリットが限定的になります。従来型のBIツールの代替として単独利用するのは難しい場合があります。 [lightdash.com], [datools.org]
+Lightdashはdbtを中心に設計されているため、dbtを採用していない組織では導入メリットが限定的になります。従来型のBIツールの代替として単独利用するのは難しい場合があります。
 
  * 機能面での成熟度
-TableauやPower BIのような長年成熟したBI製品と比べると、高度な可視化や細かな表現力では制約があるとされています。 [lightdash.com], [moge.ai]
+TableauやPower BIのような長年成熟したBI製品と比べると、高度な可視化や細かな表現力では制約があるとされています。
 
  * 運用には技術的知識が必要
-OSS版をセルフホストする場合、インフラ構築や認証、アップデート管理などを自分たちで行う必要があり、一定の技術力が求められます。 [moge.ai]
+OSS版をセルフホストする場合、インフラ構築や認証、アップデート管理などを自分たちで行う必要があり、一定の技術力が求められます。
 
-== Lightdashの提供形態
+=== 動作環境
 
 提供形態は主に次の2つです。
 
@@ -41,123 +127,3 @@ OSS版をセルフホストする場合、インフラ構築や認証、アッ�
 クラウド形態には、環境構築やアップデートが不要ですぐに使い始められること、運用負荷を抑えやすく監視や障害対応の工数を削減できること、利用者や利用量に応じてスケールしやすく拡張が容易なこと、といったメリットがあります。一方でクラウド形態は、データや接続要件によって社内規程や法令対応の確認が必要になること、機能や設定の自由度が制限され個別要件に合わせにくい場合があること、利用規模によっては継続課金が総コスト増につながることがある点に注意が必要です。
 
 本書では、ローカルPCにセルフホストという形態で、これから話を進めていきます。
-
-== まずは起動してみよう
-
-まずはlightdashを起動して見ましょう。LightdashはDockerイメージが公開されているので、Dockerを使って起動するのが簡単です。データベースとしてはPostgreSQLを使いましょう。そして気を付ける点として、Lightdashは設定情報を保存する場所として、クラウドストレージを要求します。クラウド上にデプロイする時にはS3などの本物のクラウドストレージを使えばいいのですが、ローカルに構築する時には使えません。そのため、Dockerイメージとして公開されているS3互換のMinIOを使います。
-
-ここでは、複数のDockerイメージをまとめて起動するために、Docker Composeを使います。docker-compose.yamlを以下の通り作って見ましょう（@<list>{docker_compose_yml}）。
-
-//list[docker_compose_yml][docker-compose.yml]{
-services:
-  db:
-    image: postgres:15.4
-    restart: always
-    environment:
-      POSTGRES_USER: ${PGUSER}
-      POSTGRES_PASSWORD: ${PGPASSWORD}
-      POSTGRES_DB: ${PGDATABASE}
-    ports:
-      - "5433:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
-  dwh-db:
-    image: postgres:15.4
-    restart: always
-    environment:
-      POSTGRES_USER: ${DWH_PGUSER}
-      POSTGRES_PASSWORD: ${DWH_PGPASSWORD}
-      POSTGRES_DB: ${DWH_PGDATABASE}
-    ports:
-      - "5434:5432"
-    volumes:
-      - dwh-data:/var/lib/postgresql/data
-
-  minio:
-    image: minio/minio
-    restart: always
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio-data:/data
-
-  minio-init:
-    image: minio/mc
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      sleep 3;
-      mc alias set local http://minio:9000 minioadmin minioadmin;
-      mc mb --ignore-existing local/lightdash;
-      exit 0;
-      "
-
-  lightdash:
-    image: lightdash/lightdash:latest
-    platform: linux/amd64
-    restart: always
-    depends_on:
-      - db
-      - dwh-db
-      - minio-init
-    environment:
-      PGHOST: ${PGHOST}
-      PGPORT: ${PGPORT}
-      PGUSER: ${PGUSER}
-      PGPASSWORD: ${PGPASSWORD}
-      PGDATABASE: ${PGDATABASE}
-      LIGHTDASH_SECRET: ${LIGHTDASH_SECRET}
-      SITE_URL: ${SITE_URL}
-      PORT: 8080
-      LIGHTDASH_LOG_LEVEL: debug
-      LIGHTDASH_QUERY_MAX_LIMIT: 5000
-      S3_ENDPOINT: http://minio:9000
-      S3_BUCKET: lightdash
-      S3_REGION: us-east-1
-      S3_ACCESS_KEY: minioadmin
-      S3_SECRET_KEY: minioadmin
-      S3_FORCE_PATH_STYLE: "true"
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./dbt_project:/usr/app/dbt
-
-volumes:
-  db-data:
-  dwh-data:
-  minio-data:
-//}
-
-いくつか環境変数を参照するようになっています。これらの環境変数は直接シェルで定義することもできますが、.envファイルで準備することも可能です（@<list>{_env}）
-
-//list[_env][.env]{
-# Lightdash メタデータ用 PostgreSQL (db)
-PGHOST=db
-PGPORT=5432
-PGUSER=lightdash
-PGPASSWORD=lightdash_password
-PGDATABASE=lightdash
-
-# DWH用 PostgreSQL (dwh-db)
-DWH_PGHOST=dwh-db
-DWH_PGPORT=5432
-DWH_PGUSER=dbt_user
-DWH_PGPASSWORD=dbt_password
-DWH_PGDATABASE=dbt_warehouse
-
-# Lightdash
-LIGHTDASH_SECRET=my-lightdash-secret-key-change-me
-SITE_URL=http://localhost:8080
-//}
-
-この二つを用意したら、`docker compose up`コマンドで、コンテナを起動します。コンテナが起動したら、`http://localhost:8080/`にアクセスします。Lightdashが起動していたら、以下の画面が表示されます（@<img>{chapter01/lightdash_first}）。
-
-//image[chapter01/lightdash_first][Lightdashの起動画面]{ 
-//}
