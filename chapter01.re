@@ -509,9 +509,12 @@ Lightdashの基本的な使い方は次の通りです。
 
 名前を入力するダイアログが表示されるので、任意の名前を入力します。すると空のダッシュボードが作成されます。「Add tile」ボタンをクリックすると、ダッシュボードに追加できるオブジェクトを選択できます。先ほど保存したチャートの他に、見た目を整えるためのテキストやMarkdownも挿入できます。
 
-レイアウトはグリッド方式になっており、マウスでドラッグして移動したりサイズを変えたりすることができます。好みのレイアウトになったら「Save changes」ボタンを押して保存します。
-
 //image[chapter01/dashboard-2-create-empty-dashboard][ダッシュボードの作成]{
+//}
+
+チャートなどを追加したダッシュボードはレイアウトを変更することができます。レイアウトはグリッド方式になっており、マウスでドラッグして移動したりサイズを変えたりすることができます。好みのレイアウトになったら「Save changes」ボタンを押して保存します。
+
+//image[chapter01/dashboard-3-finish][完成したダッシュボード]{
 //}
 
 これでダッシュボードが完成しました。
@@ -537,9 +540,11 @@ Lightdashはdbtモデルのセマンティックレイヤーと連携する設�
 
 === メトリクス
 
-メトリクスは、モデルのYAMLの @<tt>{config.meta.metrics} または列定義の @<tt>{config.meta.metrics} に記述します。@<tt>{fct_purchase}モデルでは以下のメトリクスが定義されています。
+メトリクスとは、売上合計や購入件数のように、集計して初めて意味を持つ数値のことです。SQLでいえば @<tt>{COUNT} や @<tt>{SUM}、@<tt>{MAX} などの集合関数で使われる項目がメトリクスに相当します。
 
-//table[metrics][fct_purchaseのメトリクス定義例]{
+@<tt>{fct_purchase}モデルに定義されているメトリクスは次の通りです。
+
+//table[metrics][fct_purchaseのメトリクス一覧]{
 ラベル	集計タイプ	対象列	説明
 --------------------------
 購入回数	count_distinct	purchase_id	ユニークな購入件数
@@ -550,21 +555,148 @@ Lightdashはdbtモデルのセマンティックレイヤーと連携する設�
 平均単価	average	unit_price	単価の平均
 //}
 
+メトリクスはモデル全体（@<tt>{config.meta.metrics}）に定義する方法と、列（@<tt>{config.meta.metrics}）に定義する方法の2種類があります。モデル全体に定義する場合は、複数の列を組み合わせたメトリクスを記述できます。@<list>{metrics_model}は購入回数を @<tt>{DISTINCT} で集計するメトリクスの例です。
+
+//list[metrics_model][DISTINCTを指定した件数]{
+models:
+  - name: fct_purchase
+    description: "購入ファクトテーブル（購入明細粒度）"
+    config:
+      meta:
+        # 中略
+        metrics:
+          num_purchases:
+            type: count_distinct
+            sql: "${TABLE}.purchase_id"
+            label: "購入回数"
+            description: "ユニークな購入件数"
+  # 以下略
+//}
+
+//image[chapter01/semanticlayer-1-example-dimension-model][モデルに定義したメトリクス][scale=0.5]{
+//}
+
+列に定義する場合は、その列の値をそのまま集計するシンプルなメトリクスを書きやすいです。@<list>{metrics_column}は @<tt>{subtotal}列の合計を売上合計として定義する例です。
+
+//list[metrics_column][小計の合計]{
+models:
+  - name: fct_purchase
+    # 中略
+    columns:
+      # 中略
+      - name: subtotal
+        # 中略
+        config:
+          meta:
+            # 中略
+            metrics:
+              total_revenue:
+                type: sum
+                label: "売上合計"
+                format: "¥#,##0"
+                description: "購入明細の小計合計"
+  # 以下略
+//}
+
+//image[chapter01/semanticlayer-2-example-dimension-column][列に定義したメトリクス][scale=0.5]{
+//}
+
 === ディメンション
 
-ディメンションは、列定義の @<tt>{config.meta.dimension} に記述します。@<tt>{purchased_at}（購入日時）には @<tt>{time_intervals} を指定することで、日・週・月・四半期・年といった時間軸での集計が自動的に使えるようになります。
+ディメンションとは、メトリクスを分析するための切り口となる属性のことです。SQLでいえば @<tt>{GROUP BY} で使われる項目がディメンションに相当します。列定義の @<tt>{config.meta.dimension} に記述します。
 
-また、@<tt>{additional_dimensions} を使うと、SQLを使って既存の列から派生した新しいディメンションを追加できます。たとえば @<tt>{dim_member}の性別（@<tt>{gender}）は @<tt>{0/1/2} というコード値ですが、@<tt>{additional_dimensions} で「男/女/それ以外」という表示名のディメンションを追加しています。
+@<tt>{fct_purchase}モデルに定義されているディメンションは次の通りです（非表示設定のものを除く）。
+
+//table[dimensions][fct_purchaseのディメンション一覧]{
+ラベル	型	グループ
+--------------------------
+購入ID	number	購入情報
+購入日時	timestamp	購入情報
+送付先住所	string	購入情報
+単価	number	金額・数量
+数量	number	金額・数量
+小計	number	金額・数量
+//}
+
+ディメンション列は @<tt>{group_details} を使って複数のグループに分類できます。@<list>{dimension_model}は列を「購入情報」と「金額・数量」の2グループに分けている例です。
+
+//list[dimension_model][ディメンション列のグルーピング]{
+models:
+  - name: fct_purchase
+    description: "購入ファクトテーブル（購入明細粒度）"
+    config:
+      meta:
+        label: "購入"
+        primary_key: id
+        group_details:
+          purchase_info:
+            label: "購入情報"
+          amounts:
+            label: "金額・数量"
+  # 以下略
+//}
+
+//image[chapter01/semanticlayer-3-example-metrics-model][ディメンション列のグルーピング][scale=0.5]{
+//}
+
+日付・時刻型の列には @<tt>{time_intervals} を指定することで、日・週・月・四半期・年といった時間軸での集計が自動的に使えるようになります。@<list>{dimension_column}は購入日時を月単位などで集計できるようにする例です。
+
+//list[dimension_column][日付列の集計単位]{
+models:
+  - name: fct_purchase
+    # 中略
+    columns:
+      # 中略
+      - name: purchased_at
+        description: "購入日時"
+        config:
+          meta:
+            dimension:
+              type: timestamp
+              label: "購入日時"
+              time_intervals: ['RAW', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'YEAR']
+              groups: ["purchase_info"]
+  # 以下略
+//}
+
+//image[chapter01/semanticlayer-4-example-metrics-column][日付列の集計単位][scale=0.5]{
+//}
 
 === テーブル
 
-テーブルは @<tt>{config.meta} の @<tt>{label} でLightdash上での表示名を定義します。また、スタースキーマのジョイン関係は @<tt>{joins} で定義します。@<tt>{fct_purchase}モデルでは以下のジョインが定義されており、クエリ画面でfct_purchaseを選ぶと、dim_memberやdim_foodの列も合わせて参照できるようになっています。
+テーブルは @<tt>{config.meta} の @<tt>{label} でLightdash上での表示名を定義します。スタースキーマのジョイン関係は @<tt>{joins} で定義します。ジョインを定義しておくことで、クエリ画面でひとつのテーブルを選ぶだけでジョイン先のテーブルの列も合わせて参照できるようになります。
 
-//table[joins][fct_purchaseのジョイン定義]{
+@<tt>{fct_purchase}モデルには次のジョインが定義されています。
+
+//table[joins][fct_purchaseのジョイン一覧]{
 ジョイン先	種別	結合条件
 --------------------------
 dim_member	left	fct_purchase.member_id = dim_member.id
 dim_food	left	fct_purchase.food_id = dim_food.id
+//}
+
+@<list>{joins_yaml}はジョイン定義のコード例です。
+
+//list[joins_yaml][ジョイン]{
+models:
+  - name: fct_purchase
+    description: "購入ファクトテーブル（購入明細粒度）"
+    config:
+      meta:
+        # 中略
+        joins:
+          - join: dim_member
+            type: left
+            sql_on: "${fct_purchase.member_id} = ${dim_member.id}"
+            relationship: many-to-one
+          - join: dim_food
+            type: left
+            sql_on: "${fct_purchase.food_id} = ${dim_food.id}"
+            relationship: many-to-one
+  # 以下略
+//}
+
+//image[chapter01/semanticlayer-5-example-table][テーブルのジョイン定義]{
 //}
 
 === メトリクスの活用例（ドリルダウン）
