@@ -45,7 +45,6 @@
 - docker-compose.yamlの中で利用する環境変数を、.envとして用意する
 - docker compose up -dで各コンテナを起動する
 - docker compose psで起動したコンテナを確認する
-- ブラウザで、Lightdashの画面を表る（スクリーンショットは、lightdash_first.png）
 
 コラムとして、終了するときには、docker compose downでコンテナを終了することを説明する。
 
@@ -68,32 +67,34 @@
 
 2. については、以下の説明を入れる
 
-- 必要な情報は”Organization name"と"What's your role?"の二つ。特に動作が変わるわけではないので、自由に選択して良い。その他の選択肢はデフォルトのままで良い
+- 必要な情報は”Organization name"と"What's your role?"の二つ。特に動作が変わるわけではないので、どんな値を選択したり入力したりして良い。その他の選択肢はデフォルトのままで良い
 - images/chapter01/lightdash_install_02_nearly.pngを挿入する
 
 3. については、以下の説明を入れる
 - 今回はローカル環境で動作するPostgreSQLを利用するため、PostgreSQLを選択する。
-- images/chapter01/lightdash_install_03_select_dwh.pngを挿入する。
+- images/chapter01/lightdash_install_03_select_dwh.pngを挿入する(
+  scale=0.5)。
 
 4. については、以下の説明を入れる
 - "Using your CLI"は、Lightdashと同じマシンに存在しているdbtプロジェクトを利用する。"Manually"は、GitHubに保存されたdbtプロジェクトを参照する。本格導入する場合は、GitHubから参照することが多いが、本書ではローカル環境で構築しているので前者を選択する。
-- images/chapter01/lightdash_install_04_how_to_upload_dbt_project.pngを挿入する
+- images/chapter01/lightdash_install_04_how_to_upload_dbt_project.pngを挿入する(
+  scale=0.5)
 
 5. については、以下の説明を入れる
 
 - lightdashのコンテナに入るためには、以下のコマンドを実行する。成功すると、lightdashコンテナのプロンプトが表示される。
 
-```
+（ここからプログラムリスト。言語指定はなし）
 # これは、Dockerのホストマシンのプロンプト
 % docker compose exec lightdash bash
 
 # これは、DockerのLightdashコンテナのプロンプト
 root@ffe29f795685:/usr/app/packages/backend# 
-```
+（ここまでプログラムリスト）
 
 - 画面上に表示されているコマンドを、そのままコピーして実行する。
 
-```
+（ここからプログラムリスト。言語指定はなし）
 root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.2474.1
 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
 npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
@@ -133,8 +134,10 @@ Successfully deployed project:
       ⚡️ http://localhost:8080/createProject/cli?projectUuid=bb0c0d1b-8add-485a-9d09-9fe64345d255
 
 Done 🕶
-```
-- images/chapter01/lightdash_install_05_lightdash_cli.pngを挿入する
+（ここまでプログラムリスト）
+
+- images/chapter01/lightdash_install_05_lightdash_cli.pngを挿入する(
+  scale=0.5)
 
 6. については以下の説明を入れる
 - 5. の実行結果の一番最後に表示されたURLにアクセスする

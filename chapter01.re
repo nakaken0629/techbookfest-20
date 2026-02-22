@@ -1,4 +1,4 @@
-#@# 最後の原稿生成時のコミット: f9de55403217fe35caaebf741020ce8f8cc166a7
+#@# 最後の原稿生成時のコミット: 5380e39a9d4d70576456ee0d84b686e7765740cc
 
 = dbtとLightdash
 
@@ -305,13 +305,130 @@ docker compose up -d
 docker compose ps
 //}
 
-すべてのコンテナが@<tt>{running}状態になったら、ブラウザで@<tt>{http://localhost:8080}にアクセスします。Lightdashの初期セットアップ画面が表示されれば、起動は成功です（@<img>{chapter01/lightdash_first}）。
+すべてのコンテナが@<tt>{running}状態になったら、起動は成功です。
 
-//image[chapter01/lightdash_first][Lightdashの初期画面]{
-//}
+===[column] コンテナの停止
 
-作業が終わったら、以下のコマンドでコンテナを停止します（@<list>{docker_compose_down}）。
+作業が終わったら、以下のコマンドでコンテナを停止します。
 
 //list[docker_compose_down][コンテナの停止]{
 docker compose down
 //}
+
+===[/column]
+
+=== 初期化
+
+初回起動時には、以下の手順に沿ってLightdashの初期化を行います。
+
+ 1. @<tt>{http://localhost:8080/}にアクセスし、必要な情報を入力して「Sign Up」ボタンを押す
+ 2. 管理者の情報を入力して「Next」ボタンを押す
+ 3. データウェアハウスの選択画面では、PostgreSQLを選ぶ
+ 4. dbtプロジェクトのアップロード方法については、「Using your CLI」を選択する
+ 5. 画面に表示されたコマンドをLightdashコンテナの中で実行する
+ 6. 初期化が完了したことを確認する
+
+==== 1. アカウント登録（Sign Up）
+
+@<tt>{http://localhost:8080/}にアクセスすると、Sign Up画面が表示されます（@<img>{chapter01/lightdash_install_01_signup}）。以下の情報を入力して「Sign Up」ボタンを押します。
+
+//table[signup][サインアップに必要な情報]{
+フィールド名	説明
+--------------------------
+First Name	名前（名）
+Last Name	名前（姓）
+Email Address	メールアドレス
+Password	パスワード
+//}
+
+//image[chapter01/lightdash_install_01_signup][Sign Up画面]{
+//}
+
+===[column] テスト用のメールアドレスについて
+
+テスト環境では、実在するドメインのメールアドレスを誤って使用しないよう、RFC 2606 で予約されている @<tt>{example.com}（@<tt>{example.org}、@<tt>{example.net} も同様）を使うのがよい習慣です。これらはIANA（インターネット番号割当機関）が管理しており、実際にメールが届くことはないため、誤送信のリスクなく安全に使えます。
+
+===[/column]
+
+==== 2. 組織情報の入力
+
+「Organization name」（組織名）と「What's your role?」（役職）を入力して「Next」ボタンを押します（@<img>{chapter01/lightdash_install_02_nearly}）。どちらの値を入力しても動作は変わりませんので、自由に選択してください。その他の選択肢はデフォルトのままで問題ありません。
+
+//image[chapter01/lightdash_install_02_nearly][組織情報の入力画面]{
+//}
+
+==== 3. データウェアハウスの選択
+
+データウェアハウスの種類を選ぶ画面が表示されます（@<img>{chapter01/lightdash_install_03_select_dwh}）。今回はローカル環境で動作するPostgreSQLを利用するため、「PostgreSQL」を選択します。
+
+//image[chapter01/lightdash_install_03_select_dwh][データウェアハウスの選択画面]{
+//}
+
+==== 4. dbtプロジェクトのアップロード方法を選択
+
+dbtプロジェクトの参照方法を選びます（@<img>{chapter01/lightdash_install_04_how_to_upload_dbt_project}）。「Using your CLI」はLightdashと同じマシン上のdbtプロジェクトを利用する方法で、「Manually」はGitHubに保存されたdbtプロジェクトを参照する方法です。本格的な運用ではGitHubからの参照が一般的ですが、本書はローカル環境での構築を前提とするため、「Using your CLI」を選択します。
+
+//image[chapter01/lightdash_install_04_how_to_upload_dbt_project][アップロード方法の選択画面]{
+//}
+
+==== 5. Lightdash CLIの実行
+
+画面に表示されたコマンドを、Lightdashコンテナの中で実行します。まず以下のコマンドでLightdashコンテナに入ります（@<list>{exec_lightdash}）。成功するとLightdashコンテナのプロンプトが表示されます。
+
+//list[exec_lightdash][Lightdashコンテナへの接続]{
+# ホストマシンのプロンプトで実行する
+% docker compose exec lightdash bash
+
+# 成功するとLightdashコンテナのプロンプトが表示される
+root@ffe29f795685:/usr/app/packages/backend#
+//}
+
+次に、画面に表示されているコマンドをそのままコピーして実行します（@<list>{lightdash_cli}）。
+
+//list[lightdash_cli][Lightdash CLIの実行例]{
+root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.2474.1
+（インストールログ略）
+root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8080 --token ldpat_XXXX
+
+  ✅️ Login successful
+
+Now you can add your first project to lightdash by doing:
+
+  ⚡️ lightdash deploy --create
+
+Done 🕶
+root@ffe29f795685:/usr/app/packages/backend# lightdash deploy --create
+
+- SUCCESS> stg_customers
+- SUCCESS> stg_orders
+- SUCCESS> stg_products
+- SUCCESS> int_orders_with_products
+- SUCCESS> fct_orders
+- SUCCESS> dim_customers
+
+Compiled 6 explores, SUCCESS=6 ERRORS=0
+
+? Add a project name or press enter to use the default: [Demo ec]
+? Do you confirm Lightdash can store your warehouse credentials so you can run queries in Lightdash? Yes
+? Do you want to save this answer for next time? Yes
+✔   New project Demo ec created
+
+Successfully deployed project:
+
+      ⚡️ http://localhost:8080/createProject/cli?projectUuid=XXXX
+
+Done 🕶
+//}
+
+//image[chapter01/lightdash_install_05_lightdash_cli][Lightdash CLIの実行結果]{
+//}
+
+==== 6. 初期化の完了
+
+手順5の実行結果の末尾に表示されたURLにアクセスします（@<img>{chapter01/lightdash_install_06_finish}）。Lightdashのダッシュボードが表示されれば、初期化は完了です。
+
+//image[chapter01/lightdash_install_06_finish][初期化完了画面]{
+//}
+
+これでLightdashの初期化が完了しました。
+
