@@ -72,18 +72,15 @@
 2. については、以下の説明を入れる
 
 - 必要な情報は”Organization name"と"What's your role?"の二つ。特に動作が変わるわけではないので、どんな値を選択したり入力したりしても良い。その他の選択肢はデフォルトのままで良い
-- images/chapter01/lightdash_install_02_nearly.pngを挿入する(
-  scale=0.5)
+- images/chapter01/lightdash_install_02_nearly.pngを挿入する(scale=0.5)
 
 3. については、以下の説明を入れる
 - 今回はローカル環境で動作するPostgreSQLを利用するため、PostgreSQLを選択する。
-- images/chapter01/lightdash_install_03_select_dwh.pngを挿入する(
-  scale=0.5)。
+- images/chapter01/lightdash_install_03_select_dwh.pngを挿入する(scale=0.5)。
 
 4. については、以下の説明を入れる
 - "Using your CLI"は、Lightdashと同じマシンに存在しているdbtプロジェクトを利用する。"Manually"は、GitHubに保存されたdbtプロジェクトを参照する。本格導入する場合は、GitHubから参照することが多いが、本書ではローカル環境で構築しているので前者を選択する。
-- images/chapter01/lightdash_install_04_how_to_upload_dbt_project.pngを挿入する(
-  scale=0.5)
+- images/chapter01/lightdash_install_04_how_to_upload_dbt_project.pngを挿入する(scale=0.5)
 
 5. については、以下の説明を入れる
 
@@ -149,8 +146,7 @@ Successfully deployed project:
 Done 🕶
 （ここまでプログラムリスト）
 
-- images/chapter01/lightdash_install_05_lightdash_cli.pngを挿入する(
-  scale=0.5)
+- images/chapter01/lightdash_install_05_lightdash_cli.pngを挿入する(scale=0.5)
 
 6. については以下の説明を入れる
 - 5. の実行結果の一番最後に表示されたURLにアクセスする
@@ -287,13 +283,13 @@ images/chapter01/chart-1-default.pngを挿入
 
 最後に"Save Chart"ボタンをクリックすると、クエリとチャートを保存することができる。
 
-images/chapter01/chart-3-save.pngを挿入
+images/chapter01/chart-3-save.pngを挿入(scale=0.5)
 
 ### ダッシュボードの作成方法
 
 クエリを作成するときは、画面左上のNewメニューからDashboardを選択する。
 
-images/chapter01/dashboard-1-input-name.pngを挿入
+images/chapter01/dashboard-1-input-name.pngを挿入(scale=0.5)
 
 名前を入力するダイアログが表示されるので、任意の名前を入力すると、空のダイアログが作成される。
 "Add file"ボタンをクリックすると、ダッシュボードに追加できるオブジェクトが選択できる。
@@ -304,3 +300,27 @@ images/chapter01/dashboard-1-input-name.pngを挿入
 images/chapter01/dashboard-2-create-empty-dashboard.pngを挿入
 
 これでダッシュボードが完成しました。
+
+## セマンティックレイヤー
+
+https://docs.lightdash.com/guides/lightdash-semantic-layer
+上記のページを参考に、以下の内容を記載する
+
+- セマンティックレイヤーとは何か？
+- Lightdashにおけるセマンティックレイヤー
+  - メトリクス
+  - ディメンション
+  - テーブル
+- 組み込み方法
+  - dbtのモデル定義に追記する方法と、独自のYAMLファイルを使う方法の二つがある。本書ではdbt projectが存在するため前者を採用している。
+
+この後、購入モデルを使って、説明していく
+
+### メトリクス
+
+### ディメンション
+
+### テーブル
+
+### メトリクスの活用例（ドリルダウン）
+
