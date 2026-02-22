@@ -343,7 +343,7 @@ models:
   # 以下略
 （ソースコードここまで）
 
-images/chapter01/semanticlayer-1-example-dimension-model.pngを挿入（scale=0.5）
+images/chapter01/semanticlayer-1-example-metrics-model.pngを挿入（scale=0.5）
 
 - 列に定義するメトリクスの例。
 （ソースコードここから。書式はYAML。名前は"小計の合計"）
@@ -366,7 +366,7 @@ models:
   # 以下略
 （ソースコードここまで）
 
-images/chapter01/semanticlayer-2-example-dimension-column.pngを挿入（scale=0.5）
+images/chapter01/semanticlayer-2-example-metrics-column.pngを挿入（scale=0.5）
 
 ### ディメンション
 
@@ -391,7 +391,7 @@ models:
   # 以下略
 （ソースコードここまで）
 
-images/chapter01/semanticlayer-3-example-metrics-model.pngを挿入（scale=0.5）
+images/chapter01/semanticlayer-3-example-dimension-model.pngを挿入（scale=0.5）
 
 - 列に定義するディメンションの例。列を日付として定義して、group byの単位を指定している。
 （ソースコードここから。書式はYAML。名前は"日付列の集計単位"）
@@ -412,7 +412,7 @@ models:
   # 以下略
 （ソースコードここまで）
 
-images/chapter01/semanticlayer-4-example-metrics-column.pngを挿入（scale=0.5）
+images/chapter01/semanticlayer-4-example-dimension-column.pngを挿入（scale=0.5）
 
 ### テーブル
 
@@ -443,3 +443,26 @@ images/chapter01/semanticlayer-5-example-table.pngを挿入
 
 ### メトリクスの活用例（ドリルダウン）
 
+- ドリルダウンの説明
+
+ドリルタウンの手順を、少し丁寧に説明する。
+
+1. ドリルダウンしたいデータを、チャート上でクリックする
+
+images/chapter01/drilldown-1-choice_bar.pngを挿入
+
+2. ドリルダウンで分析したい列を選択する。
+
+images/chapter01/drilldown-2-choise_column.pngを挿入
+
+3. 見やすいチャートを選択する。ここでは棒グラうを円グラフに変換している。
+
+images/chapter01/drilldown-3-show-detail.pngを挿入
+
+## まとめ
+
+以下の理由から、dbtを利用したデータウェアハウスを構築しているプロジェクトでは、Lightdashの導入をお勧めします。
+
+- dbtの設定に追加するので、二重定義などが発生しない
+- 分析に必要な最低限のチャートが用意されている
+- セマンティックレイヤーを使って、SQLがわからない非エンジニアでもチャートが作りやすい。
