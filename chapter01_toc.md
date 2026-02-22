@@ -95,7 +95,7 @@ root@ffe29f795685:/usr/app/packages/backend#
 
 - 画面上に表示されているコマンドを、そのままコピーして実行する。
 
-（ここからプログラムリスト。言語指定はなし）
+（ここからプログラムリスト。言語指定はなし。文字がはみ出さないよう改行は厳格に維持する）
 root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.24
 74.1
 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMExce
@@ -105,7 +105,7 @@ cript Promise library that gave JavaScript developers strong feelings about pro
 mises. They can almost certainly migrate to the native JavaScript promise now. 
 Thank you literally everyone for joining me in this bet against the odds. Be ex
 cellent to each other.
-（以下略）
+（中略）
 root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8
 080 --token ldpat_35213b4f510ba6f2bd49104f61d35a8b
 

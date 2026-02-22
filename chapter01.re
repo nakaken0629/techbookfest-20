@@ -389,7 +389,7 @@ root@ffe29f795685:/usr/app/packages/backend#
 root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.2474.1
 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
 npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-（以下略）
+（中略）
 root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8080 --token ldpat_XXXX
 
   Login successful
