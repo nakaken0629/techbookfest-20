@@ -343,7 +343,7 @@ models:
   # 以下略
 （ソースコードここまで）
 
-images/chapter01/semanticlayer-1-example-metrics-model.pngを挿入（scale=0.5）
+images/chapter01/semanticlayer-1-example-metrics-model.pngを挿入
 
 - 列に定義するメトリクスの例。
 （ソースコードここから。書式はYAML。名前は"小計の合計"）
@@ -366,7 +366,7 @@ models:
   # 以下略
 （ソースコードここまで）
 
-images/chapter01/semanticlayer-2-example-metrics-column.pngを挿入（scale=0.5）
+images/chapter01/semanticlayer-2-example-metrics-column.pngを挿入
 
 ### ディメンション
 
@@ -448,14 +448,22 @@ images/chapter01/semanticlayer-5-example-table.pngを挿入
 ドリルタウンの手順を、少し丁寧に説明する。
 
 1. ドリルダウンしたいデータを、チャート上でクリックする
+2. ドリルダウンで分析したい列を選択する。
+3. 見やすいチャートを選択する。
+
+まず初めに、ドリルダウンしたいデータを、チャート上でクリックする。
+ここでは、2025/8の売り上げデータの内訳をドリルダウンしようとしている。
 
 images/chapter01/drilldown-1-choice_bar.pngを挿入
 
-2. ドリルダウンで分析したい列を選択する。
+次に、どの列単位で内訳を見たいかを選択する。
+ここでは、商品のカテゴリごとに内訳を確認することにする。
 
 images/chapter01/drilldown-2-choise_column.pngを挿入
 
-3. 見やすいチャートを選択する。ここでは棒グラうを円グラフに変換している。
+最後に出てきた結果を見やすいチャートに変換する。
+ドリルダウンして新しく表示されたチャートでは、あらかじめfilterで選択したデータだけが抽出されるようになっている。
+ここでは棒グラうを円グラフに変換して、内訳をみやすくしている。
 
 images/chapter01/drilldown-3-show-detail.pngを挿入
 
