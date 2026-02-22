@@ -386,11 +386,18 @@ root@ffe29f795685:/usr/app/packages/backend#
 次に、画面に表示されているコマンドをそのままコピーして実行します（@<list>{lightdash_cli}）。
 
 //list[lightdash_cli][Lightdash CLIの実行例]{
-root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.2474.1
-npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
-npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.24
+74.1
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMExce
+ption instead
+npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaS
+cript Promise library that gave JavaScript developers strong feelings about pro
+mises. They can almost certainly migrate to the native JavaScript promise now.
+Thank you literally everyone for joining me in this bet against the odds. Be ex
+cellent to each other.
 （中略）
-root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8080 --token ldpat_XXXX
+root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8
+080 --token ldpat_XXXX
 
   Login successful
 
@@ -411,7 +418,8 @@ root@ffe29f795685:/usr/app/packages/backend# lightdash deploy --create
 Compiled 6 explores, SUCCESS=6 ERRORS=0
 
 ? Add a project name or press enter to use the default: [Demo ec]
-? Do you confirm Lightdash can store your warehouse credentials so you can run queries in Lightdash? Yes
+? Do you confirm Lightdash can store your warehouse credentials so you can run 
+queries in Lightdash? Yes
 ? Do you want to save this answer for next time? Yes
    New project Demo ec created
 

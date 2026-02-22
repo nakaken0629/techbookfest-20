@@ -133,7 +133,7 @@ Compiled 9 explores, SUCCESS=9 ERRORS=0
 
 ? Add a project name or press enter to use the default: [Demo ec]  
 
-? Do you confirm Lightdash can store your warehouse credentials so you can run 
+? Do you confirm Lightdash can store your warehouse credentials so you can run
 queries in Lightdash? Yes
 ? Do you want to save this answer for next time? Yes
    New project Demo ec created
