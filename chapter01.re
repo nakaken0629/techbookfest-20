@@ -200,6 +200,11 @@ services:
       - "5434:5432"
     volumes:
       - dwh-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DWH_PGUSER} -d ${DWH_PGDATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   minio:
     image: minio/minio
@@ -251,6 +256,8 @@ services:
       S3_ACCESS_KEY: minioadmin
       S3_SECRET_KEY: minioadmin
       S3_FORCE_PATH_STYLE: "true"
+      DBT_PROFILES_DIR: /usr/app/dbt
+      DBT_PROJECT_DIR: /usr/app/dbt
     ports:
       - "8080:8080"
     volumes:
