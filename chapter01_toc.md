@@ -294,10 +294,14 @@ images/chapter01/dashboard-1-input-name.pngを挿入(scale=0.5)
 名前を入力するダイアログが表示されるので、任意の名前を入力すると、空のダイアログが作成される。
 "Add file"ボタンをクリックすると、ダッシュボードに追加できるオブジェクトが選択できる。
 先ほど保存したチャートの他に、見た目を整えるためのテキストやマークダウンなども入力することができる。
+
+images/chapter01/dashboard-2-create-empty-dashboard.pngを挿入
+
+チャートなどを追加したダッシュボードはレイアウトを変更することができます。
 レイアウトはグリッド方式になっているので、マウスでドラッグして移動したりサイズを変えたりすることができる。
 好みのレイアウトになったら、"Save changes"ボタンを押して保存する。
 
-images/chapter01/dashboard-2-create-empty-dashboard.pngを挿入
+images/chapter01/dashboard-3-finish.pngを挿入
 
 これでダッシュボードが完成しました。
 
@@ -318,9 +322,124 @@ https://docs.lightdash.com/guides/lightdash-semantic-layer
 
 ### メトリクス
 
+- メトリクスの説明
+- 列がメトリクスである目安として、SQLでCOUNT, SUM, MAXなどの集合関数で使われる項目かどうか
+- fct_purchaseに定義されているメトリクスの一覧（表形式）
+
+- モデルに定義するメトリクスの例。購入明細単位ではなく購入単位の合計数
+（ソースコードここから。書式はYAML。名前は"DISTINCTを指定した件数"）
+models:
+  - name: fct_purchase
+    description: "購入ファクトテーブル（購入明細粒度）"
+    config:
+      meta:
+        # 中略
+        metrics:
+          num_purchases:
+            type: count_distinct
+            sql: "${TABLE}.purchase_id"
+            label: "購入回数"
+            description: "ユニークな購入件数"
+  # 以下略
+（ソースコードここまで）
+
+images/chapter01/semanticlayer-1-example-dimension-model.pngを挿入（scale=0.5）
+
+- 列に定義するメトリクスの例。
+（ソースコードここから。書式はYAML。名前は"小計の合計"）
+models:
+  - name: fct_purchase
+    # 中略
+    columns:
+      # 中略
+      - name: subtotal
+        # 中略
+        config:
+          meta:
+            # 中略
+            metrics:
+              total_revenue:
+                type: sum
+                label: "売上合計"
+                format: "¥#,##0"
+                description: "購入明細の小計合計"
+  # 以下略
+（ソースコードここまで）
+
+images/chapter01/semanticlayer-2-example-dimension-column.pngを挿入（scale=0.5）
+
 ### ディメンション
 
+- ディメンションの説明
+- 列がディメンションである目安として、SQLでGROUP BYで使われる項目かどうか
+- fct_purchaseに定義されているディメンションの一覧（表形式）
+
+- モデルに定義するディメンションの例。ディメンション列を、"購入情報"と"金額・数量"の二つに分類している
+（ソースコードここから。書式はYAML。名前は"ディメンション列のグルーピング"）
+models:
+  - name: fct_purchase
+    description: "購入ファクトテーブル（購入明細粒度）"
+    config:
+      meta:
+        label: "購入"
+        primary_key: id
+        group_details:
+          purchase_info:
+            label: "購入情報"
+          amounts:
+            label: "金額・数量"
+  # 以下略
+（ソースコードここまで）
+
+images/chapter01/semanticlayer-3-example-metrics-model.pngを挿入（scale=0.5）
+
+- 列に定義するディメンションの例。列を日付として定義して、group byの単位を指定している。
+（ソースコードここから。書式はYAML。名前は"日付列の集計単位"）
+models:
+  - name: fct_purchase
+      # 中略
+    columns:
+      # 中略
+      - name: purchased_at
+        description: "購入日時"
+        config:
+          meta:
+            dimension:
+              type: timestamp
+              label: "購入日時"
+              time_intervals: ['RAW', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'YEAR']
+              groups: ["purchase_info"]
+  # 以下略
+（ソースコードここまで）
+
+images/chapter01/semanticlayer-4-example-metrics-column.pngを挿入（scale=0.5）
+
 ### テーブル
+
+- テーブル（主にジョイン）の説明
+- fct_purchaseにジョインされているテーブルの一覧（表形式）
+
+- ジョインの例。会員(member)と食品(food)とジョインしている。
+（ソースコードここから。書式はYAML。名前は"ジョイン"）
+models:
+  - name: fct_purchase
+    description: "購入ファクトテーブル（購入明細粒度）"
+    config:
+      meta:
+        # 中略
+        joins:
+          - join: dim_member
+            type: left
+            sql_on: "${fct_purchase.member_id} = ${dim_member.id}"
+            relationship: many-to-one
+          - join: dim_food
+            type: left
+            sql_on: "${fct_purchase.food_id} = ${dim_food.id}"
+            relationship: many-to-one
+  # 以下略
+（ソースコードここまで）
+
+images/chapter01/semanticlayer-5-example-table.pngを挿入
 
 ### メトリクスの活用例（ドリルダウン）
 
