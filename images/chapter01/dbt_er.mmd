@@ -1,0 +1,34 @@
+erDiagram
+    fct_purchase }o--|| dim_member : "member_id"
+    fct_purchase }o--|| dim_food : "food_id"
+
+    fct_purchase {
+        SERIAL id PK
+        INTEGER purchase_id
+        INTEGER member_id FK
+        INTEGER food_id FK
+        TIMESTAMP purchased_at
+        VARCHAR shipping_address
+        INTEGER unit_price
+        INTEGER quantity
+        INTEGER subtotal
+    }
+    dim_member {
+        SERIAL id PK
+        VARCHAR last_name
+        VARCHAR first_name
+        DATE birth_date
+        VARCHAR gender
+        VARCHAR address
+        VARCHAR status
+        TIMESTAMP paid_at
+        TIMESTAMP quit_at
+        TIMESTAMP last_login_at
+    }
+    dim_food {
+        SERIAL id PK
+        VARCHAR name
+        INTEGER category_id
+        VARCHAR category_name
+        INTEGER price
+    }

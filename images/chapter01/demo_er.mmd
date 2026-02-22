@@ -1,0 +1,60 @@
+erDiagram
+    member ||--o{ purchase : ""
+    member ||--|| member_property : ""
+    member ||--o{ member_status_log : ""
+    purchase ||--o{ purchase_detail : ""
+    food ||--o{ purchase_detail : ""
+    category ||--o{ food : ""
+
+    member {
+        SERIAL id PK
+        VARCHAR last_name
+        VARCHAR first_name
+        DATE birth_date
+        VARCHAR gender
+        VARCHAR address
+        VARCHAR status
+        TIMESTAMP paid_at
+        TIMESTAMP quit_at
+        TIMESTAMP last_login_at
+    }
+    member_property {
+        INTEGER id PK
+        INTEGER to_paid_days
+        INTEGER to_sleep_days
+        INTEGER to_quit_days
+    }
+    category {
+        SERIAL id PK
+        VARCHAR name
+    }
+    food {
+        SERIAL id PK
+        VARCHAR name
+        INTEGER category_id FK
+        INTEGER price
+    }
+    purchase {
+        SERIAL id PK
+        INTEGER member_id FK
+        VARCHAR member_name
+        VARCHAR shipping_address
+        TIMESTAMP purchased_at
+        INTEGER total_amount
+    }
+    purchase_detail {
+        SERIAL id PK
+        INTEGER purchase_id FK
+        INTEGER food_id FK
+        VARCHAR food_name
+        INTEGER unit_price
+        INTEGER quantity
+        INTEGER subtotal
+    }
+    member_status_log {
+        SERIAL id PK
+        INTEGER member_id FK
+        VARCHAR status_before
+        VARCHAR status_after
+        TIMESTAMP changed_at
+    }

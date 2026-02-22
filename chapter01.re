@@ -1,10 +1,32 @@
-#@# 最後の原稿生成時のコミット: 5380e39a9d4d70576456ee0d84b686e7765740cc
+#@# 最後の原稿生成時のコミット: 00c73b3f9c6d5572b985324ee139ebfc346579c5
 
 = dbtとLightdash
 
+本章では、dbtとLightdashを組み合わせたデータ分析基盤の構築方法を説明します。まずLightdashとはどのようなツールなのかを概説し、他のBIツールと比較しながらその特徴を整理します。続いて、サンプルソースを使ってLightdashをローカル環境へ導入する手順を解説します。最後に、分析の元となるデモデータベースの構成と、dbtプロジェクトによるELT処理の流れを説明します。
+
+この章で紹介するdbtとLightdashのサンプルソースは、以下のGitHubリポジトリから参照してください。
+
+@<tt>{https://github.com/nakaken0629/utilizing-dbt-lightdash}
+
+== Lightdashの概要
+
+Lightdashは、dbtプロジェクトを起点とした「モデル駆動型BI」を実現するオープンソースのBIツールです。dbtで定義したモデルや指標を、そのまま分析基盤における唯一の正として扱えるため、SQLやロジックの重複を避けやすく、指標定義のブレも防ぎやすくなります。OSSとしてセルフホストでき、ベンダーロックインを回避しやすい点も魅力です。さらに、開発者向けのコード管理と、非エンジニアでも扱える探索的UIを両立しており、データチームとビジネス部門の協業を強力に支援します。
+
+=== 動作環境
+
+Lightdashの提供形態は主に次の2種類です。
+
+ * クラウド版
+Lightdashが提供するSaaSです。環境構築なしに利用を開始できます。運用や監視はLightdash社が担うため、すぐに使い始めたい場合や運用コストを抑えたい場合に向いています。
+
+ * セルフホスティング版
+自社インフラにDockerやKubernetesを使って構築し、設定や運用を自分たちで管理する形態です。データの統制がしやすく、認証や構成のカスタマイズ性が高い点がメリットです。一方で、監視・バックアップ・アップデートなどの運用負荷が増える点には注意が必要です。
+
+本書では、ローカルPCにDockerを使ってセルフホスティング方式で構築する形で話を進めていきます。
+
 == 他のBIツールとの比較
 
-BIツールは多種多様なものが存在します。Lightdashを選ぶにあたって、代表的なBIツールであるTableau、Looker Studio、Redashとの比較を行います。
+BIツールは多種多様なものが存在します。Lightdashを選ぶにあたって、代表的なBIツールであるTableau、Looker Studio、Redashとのメリット・デメリットを比較します。
 
 === Tableau
 
@@ -88,51 +110,9 @@ dbtモデルをセマンティックレイヤーとして活用する機能が�
 
 これらのBIツールと比較すると、Lightdashは特にdbtを採用しているチームに対して強みを持ちます。dbtのモデルや指標をそのままセマンティックレイヤーとして利用できるため、指標定義の二重管理を避け、データの一貫性を保ちやすい点が最大の特長です。OSSとしてセルフホストできる点はRedashと共通しますが、dbtとの深い統合という点でLightdashが優位に立ちます。
 
-== Lightdashの概要
-
-OSSのBIツールであるLightdashは、dbtプロジェクトを起点とした「モデル駆動型BI」を実現できる点に大きな特長があります。dbtで定義したモデルや指標を、そのまま分析基盤における唯一の正として扱えるため、SQLやロジックの重複を避けやすく、指標定義のブレも防ぎやすくなります。OSSとしてセルフホストでき、ベンダーロックインを回避しやすい点も魅力です。さらに、開発者向けのコード管理と、非エンジニアでも扱える探索的UIを両立しており、データチームとビジネス部門の協業を強力に支援します。
-
-Lightdashのメリットは以下の通りです。
-
- * dbtネイティブな設計
-Lightdashはdbtプロジェクトを直接読み込み、モデルやメトリクスをそのままセマンティックレイヤーとして利用します。これにより、指標定義の二重管理を避け、分析ロジックの一貫性を保てます。
-
- * OSSでセルフホスト可能
-オープンソースとして提供されており、自社環境へのデプロイが可能です。プロプライエタリなBIツールに比べ、ベンダーロックインを回避しやすい点が評価されています。
-
- * Lookerライクな探索UI
-事前定義された指標を使った探索（Explore）やダッシュボード作成が可能で、SQLを書かずに分析できるUIを備えています。非エンジニアでも扱いやすい点が特長です。
-
- * 開発者フレンドリーな運用
-Gitによるバージョン管理やdbt中心のワークフローと親和性が高く、アナリティクスエンジニアリングの実践に適しています。
-
-またLightdashのデメリットは以下の通りです。
-
- * dbt前提のツールである
-Lightdashはdbtを中心に設計されているため、dbtを採用していない組織では導入メリットが限定的になります。従来型のBIツールの代替として単独利用するのは難しい場合があります。
-
- * 機能面での成熟度
-TableauやPower BIのような長年成熟したBI製品と比べると、高度な可視化や細かな表現力では制約があるとされています。
-
- * 運用には技術的知識が必要
-OSS版をセルフホストする場合、インフラ構築や認証、アップデート管理などを自分たちで行う必要があり、一定の技術力が求められます。
-
-=== 動作環境
-
-提供形態は主に次の2つです。
-
- * セルフホスト：自社インフラに導入し、設定や運用を自分たちで管理します。
- * クラウド：Lightdashが提供するSaaSで、環境構築なしに利用開始できます。
-
-セルフホストには、データ統制がしやすくネットワークや権限を自社方針に合わせやすいこと、認証や構成のカスタマイズ性が高く要件に応じて柔軟に設計できること、利用規模によってはクラウド課金より総コストを抑えられる場合があること、といったメリットがあります。一方でセルフホストは、監視・バックアップ・アップデート・障害対応などの運用負荷が増えること、セキュリティ責任が自社に寄るため脆弱性対応や権限設計の質が重要になること、立ち上げに時間がかかり運用が属人化しやすいことがデメリットになります。
-
-クラウド形態には、環境構築やアップデートが不要ですぐに使い始められること、運用負荷を抑えやすく監視や障害対応の工数を削減できること、利用者や利用量に応じてスケールしやすく拡張が容易なこと、といったメリットがあります。一方でクラウド形態は、データや接続要件によって社内規程や法令対応の確認が必要になること、機能や設定の自由度が制限され個別要件に合わせにくい場合があること、利用規模によっては継続課金が総コスト増につながることがある点に注意が必要です。
-
-本書では、ローカルPCにセルフホストという形態で、これから話を進めていきます。
-
 == Lightdashの導入
 
-本節では、サンプルソース（@<tt>{sample/utilizing-dbt-lightdash}）を使って、Lightdashをローカル環境に導入する手順を説明します。
+本節では、サンプルソースを使って、Lightdashをローカル環境に導入する手順を説明します。
 
 === 前提条件
 
@@ -158,6 +138,9 @@ Lightdashがユーザーやダッシュボードなどのアプリケーショ�
 
  * dwh-db
 Lightdashが分析クエリを実行する対象となるデータウェアハウスです。本書ではPostgreSQLで代用します。dbtが変換したデータモデルはこのデータベースに格納されます。
+
+ * demo-db
+データウェアハウスに取り込むソースデータが保存されているデータベースです。本書では食品をオンラインで販売するECサイトのデータベースを想定しています。
 
  * minio
 S3互換のオブジェクトストレージです。Lightdashはチャートのエクスポートなどにクラウドストレージを必要とするため、ローカル環境ではMinIOで代替します。
@@ -202,6 +185,23 @@ services:
       - dwh-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DWH_PGUSER} -d ${DWH_PGDATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  demo-db:
+    image: postgres:15.4
+    restart: always
+    environment:
+      POSTGRES_USER: ${DEMO_PGUSER}
+      POSTGRES_PASSWORD: ${DEMO_PGPASSWORD}
+      POSTGRES_DB: ${DEMO_PGDATABASE}
+    ports:
+      - "5435:5432"
+    volumes:
+      - demo-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DEMO_PGUSER} -d ${DEMO_PGDATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -266,6 +266,7 @@ services:
 volumes:
   db-data:
   dwh-data:
+  demo-data:
   minio-data:
 //}
 
@@ -288,8 +289,15 @@ DWH_PGUSER=dbt_user
 DWH_PGPASSWORD=dbt_password
 DWH_PGDATABASE=dbt_warehouse
 
+# Demo用 PostgreSQL (demo-db)
+DEMO_PGHOST=demo-db
+DEMO_PGPORT=5432
+DEMO_PGUSER=demo_user
+DEMO_PGPASSWORD=demo_password
+DEMO_PGDATABASE=demo_db
+
 # Lightdash
-LIGHTDASH_SECRET=this-is-a-secret-key
+LIGHTDASH_SECRET=my-lightdash-secret-key-change-me
 SITE_URL=http://localhost:8080
 //}
 
@@ -376,10 +384,10 @@ dbtプロジェクトの参照方法を選びます（@<img>{chapter01/lightdash
 画面に表示されたコマンドを、Lightdashコンテナの中で実行します。まず以下のコマンドでLightdashコンテナに入ります（@<list>{exec_lightdash}）。成功するとLightdashコンテナのプロンプトが表示されます。
 
 //list[exec_lightdash][Lightdashコンテナへの接続]{
-# ホストマシンのプロンプトで実行する
+# これは、Dockerのホストマシンのプロンプト
 % docker compose exec lightdash bash
 
-# 成功するとLightdashコンテナのプロンプトが表示される
+# これは、DockerのLightdashコンテナのプロンプト
 root@ffe29f795685:/usr/app/packages/backend#
 //}
 
@@ -397,7 +405,7 @@ Thank you literally everyone for joining me in this bet against the odds. Be ex
 cellent to each other.
 （中略）
 root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8
-080 --token ldpat_XXXX
+080 --token ldpat_35213b4f510ba6f2bd49104f61d35a8b
 
   Login successful
 
@@ -408,24 +416,30 @@ Now you can add your first project to lightdash by doing:
 Done 🕶
 root@ffe29f795685:/usr/app/packages/backend# lightdash deploy --create
 
-- SUCCESS> stg_customers
-- SUCCESS> stg_orders
-- SUCCESS> stg_products
-- SUCCESS> int_orders_with_products
-- SUCCESS> fct_orders
-- SUCCESS> dim_customers
 
-Compiled 6 explores, SUCCESS=6 ERRORS=0
+- SUCCESS> stg_member_status_log
+- SUCCESS> stg_purchase_detail
+- SUCCESS> stg_food
+- SUCCESS> stg_category
+- SUCCESS> stg_member
+- SUCCESS> stg_purchase
+- SUCCESS> fct_purchase
+- SUCCESS> dim_food
+- SUCCESS> dim_member
+
+Compiled 9 explores, SUCCESS=9 ERRORS=0
 
 ? Add a project name or press enter to use the default: [Demo ec]
-? Do you confirm Lightdash can store your warehouse credentials so you can run 
+
+? Do you confirm Lightdash can store your warehouse credentials so you can run
 queries in Lightdash? Yes
 ? Do you want to save this answer for next time? Yes
    New project Demo ec created
 
 Successfully deployed project:
 
-      http://localhost:8080/createProject/cli?projectUuid=XXXX
+      http://localhost:8080/createProject/cli?projectUuid=bb0c0d1b-8add-485a-9
+d09-9fe64345d255
 
 Done 🕶
 //}
@@ -440,5 +454,81 @@ Done 🕶
 //image[chapter01/lightdash_install_06_finish][初期化完了画面]{
 //}
 
-これでLightdashの初期化が完了しました。
+これでLightdashの初期化が終わりました。
 
+== demoデータベース
+
+本章のサンプルでは、食品をオンラインで販売するECサイトのデータベース（demo-db）を用意しています。実際にWebアプリケーションが動いているわけではなく、ECサイトをシミュレートしたデータを生成するシミュレータを用意しています。
+
+demoデータベースのER図を@<img>{chapter01/demo_er}に示します。会員（member）、カテゴリ（category）、食品（food）、購入（purchase）、購入明細（purchase_detail）、会員ステータス変更履歴（member_status_log）の6つのテーブルで構成されています。
+
+//image[chapter01/demo_er][demoデータベースのER図]{
+//}
+
+=== demoデータベースのデータ作成方法
+
+以下の手順は、Dockerコンテナが動作している状態で実行してください。
+
+ 1. @<tt>{demo}ディレクトリに移動する
+ 2. @<tt>{uv run init.py}を実行する
+ 3. @<tt>{uv run seed.py}を実行する
+
+手順2の@<tt>{uv run init.py}は、demo-dbデータベースとテーブルを初期化します。すでにデータベースが存在する場合は一度削除してから再作成するため、既存のデータはすべて消えます。初回実行時や、データをリセットしたいときに実行してください。
+
+手順3の@<tt>{uv run seed.py}は、テストデータ生成のシミュレータです。会員の登録・有料会員への移行・購入・退会といった一連の行動を日付ごとにシミュレートし、その結果をdemo-dbに投入します。
+
+これで、demoデータベースにデータが作成されました。
+
+== dbtプロジェクトの説明
+
+本節では、Lightdashが利用するdbtプロジェクトの構成を説明します。demoデータベースからデータウェアハウスにデータを取り込む方法、そしてdbtによるデータ変換の流れを解説します。
+
+dbtプロジェクトのマート層のER図を@<img>{chapter01/dbt_er}に示します。マート層はスタースキーマに沿って設計されており、購入明細を中心としたファクトテーブル（fct_purchase）と、食品（dim_food）・会員（dim_member）の2つのディメンションテーブルで構成されています。
+
+//image[chapter01/dbt_er][dbtプロジェクトのマート層ER図]{
+//}
+
+この後、データウェアハウスにおけるELTの、書き込み（Load）と変換（Transform）について説明していきます。
+
+//note[抽出（Extract）について]{
+今回demo-dbは直接参照できるところにあるので、クラウドストレージなどへの抽出（Extract）は省略しています。
+//}
+
+=== 読み込み（Load）
+
+dbtはデータウェアハウスへの書き込み（Load）には対応していません。一般的には、TROCCOやAirflowなどといった専用のETL/ELTツールを利用します。
+
+本書では、テスト用に簡単な独自のローダーツールを@<tt>{dbt_project/seeds_loader}ディレクトリに用意しています。なお、dbtには@<tt>{seeds}ディレクトリにCSVファイルを配置してデータを投入する機能もありますが、より実際のデータに近いものを作成したかったため、今回は独自のローダーツールを作成しました。
+
+ * @<tt>{init.py}
+データウェアハウス（dwh-db）内に@<tt>{public_raw}スキーマを作成し、データの受け口となるテーブルを用意します。
+
+ * @<tt>{load.py}
+demo-dbの各テーブルのデータを、dwh-dbの@<tt>{public_raw}スキーマにそのままコピーします。
+
+実行方法は以下の通りです。
+
+ 1. @<tt>{dbt_project/seeds_loader}ディレクトリに移動する
+ 2. @<tt>{uv run init.py}を実行する
+ 3. @<tt>{uv run load.py}を実行する
+
+手順2の@<tt>{uv run init.py}は、dwh-db内に@<tt>{public_raw}スキーマを作成します。すでにスキーマが存在する場合は削除して再作成するため、既存データは消えます。
+
+手順3の@<tt>{uv run load.py}は、demo-dbの各テーブルの内容をdwh-dbの@<tt>{public_raw}スキーマにコピーします。実行のたびに既存データを洗い替えします。
+
+=== 変換（Transform）
+
+変換では、dbtの機能を使って、raw層（@<tt>{public_raw}）に読み込まれたデータをstaging層からmarts層へと変換していきます。データのテスト、型変換、クリーニングなどは、今回は省略しています。
+
+dbtはローカルPCで動かすほか、Lightdashが動作するDockerコンテナ上でも動作します。そのため、@<tt>{profiles.yml}に以下の2つのターゲットを用意しています。
+
+ * @<tt>{local}
+ローカルPC上でdbtを動かす時のターゲットです。dwh-dbには@<tt>{localhost:5434}で接続します。
+
+ * @<tt>{dev}（デフォルト）
+DockerコンテナのLightdash上でdbtを動かす時のターゲットです。dwh-dbにはコンテナ名@<tt>{dwh-db}で接続します。
+
+ローカルPCから変換を実行する場合は、以下の手順に沿って実行してください。
+
+ 1. @<tt>{dbt_project}ディレクトリに移動する
+ 2. @<tt>{uv run dbt run --target local}を実行する
