@@ -573,7 +573,7 @@ models:
   # 以下略
 //}
 
-//image[chapter01/semanticlayer-1-example-dimension-model][モデルに定義したメトリクス][scale=0.5]{
+//image[chapter01/semanticlayer-1-example-metrics-model][モデルに定義したメトリクス][scale=0.5]{
 //}
 
 列に定義する場合は、その列の値をそのまま集計するシンプルなメトリクスを書きやすいです。@<list>{metrics_column}は @<tt>{subtotal}列の合計を売上合計として定義する例です。
@@ -598,7 +598,7 @@ models:
   # 以下略
 //}
 
-//image[chapter01/semanticlayer-2-example-dimension-column][列に定義したメトリクス][scale=0.5]{
+//image[chapter01/semanticlayer-2-example-metrics-column][列に定義したメトリクス][scale=0.5]{
 //}
 
 === ディメンション
@@ -636,7 +636,7 @@ models:
   # 以下略
 //}
 
-//image[chapter01/semanticlayer-3-example-metrics-model][ディメンション列のグルーピング][scale=0.5]{
+//image[chapter01/semanticlayer-3-example-dimension-model][ディメンション列のグルーピング][scale=0.5]{
 //}
 
 日付・時刻型の列には @<tt>{time_intervals} を指定することで、日・週・月・四半期・年といった時間軸での集計が自動的に使えるようになります。@<list>{dimension_column}は購入日時を月単位などで集計できるようにする例です。
@@ -659,7 +659,7 @@ models:
   # 以下略
 //}
 
-//image[chapter01/semanticlayer-4-example-metrics-column][日付列の集計単位][scale=0.5]{
+//image[chapter01/semanticlayer-4-example-dimension-column][日付列の集計単位][scale=0.5]{
 //}
 
 === テーブル
@@ -701,4 +701,34 @@ models:
 
 === メトリクスの活用例（ドリルダウン）
 
-Lightdashでは、チャートのデータポイントをクリックすることでドリルダウン分析ができます。たとえば月次の売上合計グラフの特定の月をクリックすると、その月の明細データに絞り込んだクエリを自動的に実行できます。セマンティックレイヤーにメトリクスとディメンションを適切に定義しておくことで、このようなインタラクティブな分析が簡単に行えるようになります。
+Lightdashでは、チャートのデータポイントをクリックすることでドリルダウン分析ができます。セマンティックレイヤーにメトリクスとディメンションを適切に定義しておくことで、このようなインタラクティブな分析が簡単に行えるようになります。
+
+ドリルダウンの手順は次の通りです。
+
+ 1. ドリルダウンしたいデータをチャート上でクリックする
+
+//image[chapter01/drilldown-1-choice_bar][ドリルダウンするデータの選択]{
+//}
+
+ 2. ドリルダウンで分析したい列を選択する
+
+//image[chapter01/drilldown-2-choise_column][分析列の選択]{
+//}
+
+ 3. 見やすいチャートの種類を選択する。ここでは棒グラフを円グラフに変換している
+
+//image[chapter01/drilldown-3-show-detail][ドリルダウン結果の表示]{
+//}
+
+== まとめ
+
+以下の理由から、dbtを利用したデータウェアハウスを構築しているプロジェクトでは、Lightdashの導入をお勧めします。
+
+ * dbtの設定への追記で完結し、二重定義が発生しない
+dbtのYAMLにメトリクスやディメンションを追記するだけで、Lightdashにセマンティックレイヤーとして反映されます。他のBIツールのように別途指標を再定義する必要がなく、定義の一元管理を保ちやすくなります。
+
+ * 分析に必要な最低限のチャートが標準で用意されている
+クエリを実行すると棒グラフが自動的に生成されます。グラフの種類変更や凡例のカスタマイズも画面上で完結するため、すぐに使い始めることができます。
+
+ * セマンティックレイヤーにより非エンジニアでも分析しやすい
+SQLを書かずにテーブルや列を選ぶだけでクエリを作成できます。メトリクスとディメンションを整備しておくことで、ビジネスユーザーが自律的にデータ探索できる環境を作りやすくなります。
