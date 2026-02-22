@@ -156,120 +156,6 @@ MinIOはS3互換のAPIを提供するオープンソースのオブジェクト�
 
 ===[/column]
 
-実際の@<tt>{docker-compose.yml}は以下の通りです（@<list>{docker_compose_yml}）。
-
-//list[docker_compose_yml][docker-compose.yml]{
-services:
-  db:
-    image: postgres:15.4
-    restart: always
-    environment:
-      POSTGRES_USER: ${PGUSER}
-      POSTGRES_PASSWORD: ${PGPASSWORD}
-      POSTGRES_DB: ${PGDATABASE}
-    ports:
-      - "5433:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
-  dwh-db:
-    image: postgres:15.4
-    restart: always
-    environment:
-      POSTGRES_USER: ${DWH_PGUSER}
-      POSTGRES_PASSWORD: ${DWH_PGPASSWORD}
-      POSTGRES_DB: ${DWH_PGDATABASE}
-    ports:
-      - "5434:5432"
-    volumes:
-      - dwh-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DWH_PGUSER} -d ${DWH_PGDATABASE}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  demo-db:
-    image: postgres:15.4
-    restart: always
-    environment:
-      POSTGRES_USER: ${DEMO_PGUSER}
-      POSTGRES_PASSWORD: ${DEMO_PGPASSWORD}
-      POSTGRES_DB: ${DEMO_PGDATABASE}
-    ports:
-      - "5435:5432"
-    volumes:
-      - demo-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DEMO_PGUSER} -d ${DEMO_PGDATABASE}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  minio:
-    image: minio/minio
-    restart: always
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    command: server /data --console-address ":9001"
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio-data:/data
-
-  minio-init:
-    image: minio/mc
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      sleep 3;
-      mc alias set local http://minio:9000 minioadmin minioadmin;
-      mc mb --ignore-existing local/lightdash;
-      exit 0;
-      "
-
-  lightdash:
-    image: lightdash/lightdash:latest
-    platform: linux/amd64
-    restart: always
-    depends_on:
-      - db
-      - dwh-db
-      - minio-init
-    environment:
-      PGHOST: ${PGHOST}
-      PGPORT: ${PGPORT}
-      PGUSER: ${PGUSER}
-      PGPASSWORD: ${PGPASSWORD}
-      PGDATABASE: ${PGDATABASE}
-      LIGHTDASH_SECRET: ${LIGHTDASH_SECRET}
-      SITE_URL: ${SITE_URL}
-      PORT: 8080
-      LIGHTDASH_LOG_LEVEL: debug
-      LIGHTDASH_QUERY_MAX_LIMIT: 5000
-      S3_ENDPOINT: http://minio:9000
-      S3_BUCKET: lightdash
-      S3_REGION: us-east-1
-      S3_ACCESS_KEY: minioadmin
-      S3_SECRET_KEY: minioadmin
-      S3_FORCE_PATH_STYLE: "true"
-      DBT_PROFILES_DIR: /usr/app/dbt
-      DBT_PROJECT_DIR: /usr/app/dbt
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./dbt_project:/usr/app/dbt
-
-volumes:
-  db-data:
-  dwh-data:
-  demo-data:
-  minio-data:
-//}
-
 === 起動
 
 Lightdashを起動するには、まず@<tt>{docker-compose.yml}が参照する環境変数を記述した@<tt>{.env}ファイルを用意します（@<list>{env}）。
@@ -485,13 +371,33 @@ demoデータベースのER図を@<img>{chapter01/demo_er}に示します。会�
 
 dbtプロジェクトのマート層のER図を@<img>{chapter01/dbt_er}に示します。マート層はスタースキーマに沿って設計されており、購入明細を中心としたファクトテーブル（fct_purchase）と、食品（dim_food）・会員（dim_member）の2つのディメンションテーブルで構成されています。
 
-//image[chapter01/dbt_er][dbtプロジェクトのマート層ER図]{
+//image[chapter01/dbt_er][dbtプロジェクトのマート層ER図][scale=0.5]{
 //}
 
 この後、データウェアハウスにおけるELTの、書き込み（Load）と変換（Transform）について説明していきます。
 
 //note[抽出（Extract）について]{
 今回demo-dbは直接参照できるところにあるので、クラウドストレージなどへの抽出（Extract）は省略しています。
+//}
+
+=== .env.local
+
+@<tt>{.env}ファイルはDockerコンテナ内で動作する時の接続設定ですが、読み込みと変換はローカルPC上で行うものです。そのため、別途@<tt>{.env.local}ファイルを用意して、ローカルPCからの接続先設定を行います（@<list>{env_local}）。
+
+//list[env_local][.env.local]{
+# Demo用 PostgreSQL (demo-db)
+DEMO_PGHOST=localhost
+DEMO_PGPORT=5435
+DEMO_PGUSER=demo_user
+DEMO_PGPASSWORD=demo_password
+DEMO_PGDATABASE=demo_db
+
+# DWH用 PostgreSQL (dwh-db)
+DWH_PGHOST=localhost
+DWH_PGPORT=5434
+DWH_PGUSER=dbt_user
+DWH_PGPASSWORD=dbt_password
+DWH_PGDATABASE=dbt_warehouse
 //}
 
 === 読み込み（Load）
@@ -532,3 +438,7 @@ DockerコンテナのLightdash上でdbtを動かす時のターゲットです�
 
  1. @<tt>{dbt_project}ディレクトリに移動する
  2. @<tt>{uv run dbt run --target local}を実行する
+
+これで、Lightdashで参照するデータが、データウェアハウス上に作成されました。
+
+== Lightdashの使い方
