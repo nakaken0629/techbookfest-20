@@ -352,23 +352,23 @@ Password	パスワード
 
 ==== 2. 組織情報の入力
 
-「Organization name」（組織名）と「What's your role?」（役職）を入力して「Next」ボタンを押します（@<img>{chapter01/lightdash_install_02_nearly}）。どちらの値を入力しても動作は変わりませんので、自由に選択してください。その他の選択肢はデフォルトのままで問題ありません。
+「Organization name」（組織名）と「What's your role?」（役職）を入力して「Next」ボタンを押します（@<img>{chapter01/lightdash_install_02_nearly}）。特に動作が変わるわけではないので、どんな値を選択したり入力したりしても構いません。その他の選択肢はデフォルトのままで良いです。
 
-//image[chapter01/lightdash_install_02_nearly][組織情報の入力画面]{
+//image[chapter01/lightdash_install_02_nearly][組織情報の入力画面][scale=0.5]{
 //}
 
 ==== 3. データウェアハウスの選択
 
 データウェアハウスの種類を選ぶ画面が表示されます（@<img>{chapter01/lightdash_install_03_select_dwh}）。今回はローカル環境で動作するPostgreSQLを利用するため、「PostgreSQL」を選択します。
 
-//image[chapter01/lightdash_install_03_select_dwh][データウェアハウスの選択画面]{
+//image[chapter01/lightdash_install_03_select_dwh][データウェアハウスの選択画面][scale=0.5]{
 //}
 
 ==== 4. dbtプロジェクトのアップロード方法を選択
 
 dbtプロジェクトの参照方法を選びます（@<img>{chapter01/lightdash_install_04_how_to_upload_dbt_project}）。「Using your CLI」はLightdashと同じマシン上のdbtプロジェクトを利用する方法で、「Manually」はGitHubに保存されたdbtプロジェクトを参照する方法です。本格的な運用ではGitHubからの参照が一般的ですが、本書はローカル環境での構築を前提とするため、「Using your CLI」を選択します。
 
-//image[chapter01/lightdash_install_04_how_to_upload_dbt_project][アップロード方法の選択画面]{
+//image[chapter01/lightdash_install_04_how_to_upload_dbt_project][アップロード方法の選択画面][scale=0.5]{
 //}
 
 ==== 5. Lightdash CLIの実行
@@ -387,14 +387,16 @@ root@ffe29f795685:/usr/app/packages/backend#
 
 //list[lightdash_cli][Lightdash CLIの実行例]{
 root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.2474.1
-（インストールログ略）
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+（以下略）
 root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8080 --token ldpat_XXXX
 
-  ✅️ Login successful
+  Login successful
 
 Now you can add your first project to lightdash by doing:
 
-  ⚡️ lightdash deploy --create
+  lightdash deploy --create
 
 Done 🕶
 root@ffe29f795685:/usr/app/packages/backend# lightdash deploy --create
@@ -411,16 +413,16 @@ Compiled 6 explores, SUCCESS=6 ERRORS=0
 ? Add a project name or press enter to use the default: [Demo ec]
 ? Do you confirm Lightdash can store your warehouse credentials so you can run queries in Lightdash? Yes
 ? Do you want to save this answer for next time? Yes
-✔   New project Demo ec created
+   New project Demo ec created
 
 Successfully deployed project:
 
-      ⚡️ http://localhost:8080/createProject/cli?projectUuid=XXXX
+      http://localhost:8080/createProject/cli?projectUuid=XXXX
 
 Done 🕶
 //}
 
-//image[chapter01/lightdash_install_05_lightdash_cli][Lightdash CLIの実行結果]{
+//image[chapter01/lightdash_install_05_lightdash_cli][Lightdash CLIの実行結果][scale=0.5]{
 //}
 
 ==== 6. 初期化の完了

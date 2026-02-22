@@ -67,8 +67,9 @@
 
 2. については、以下の説明を入れる
 
-- 必要な情報は”Organization name"と"What's your role?"の二つ。特に動作が変わるわけではないので、どんな値を選択したり入力したりして良い。その他の選択肢はデフォルトのままで良い
-- images/chapter01/lightdash_install_02_nearly.pngを挿入する
+- 必要な情報は”Organization name"と"What's your role?"の二つ。特に動作が変わるわけではないので、どんな値を選択したり入力したりしても良い。その他の選択肢はデフォルトのままで良い
+- images/chapter01/lightdash_install_02_nearly.pngを挿入する(
+  scale=0.5)
 
 3. については、以下の説明を入れる
 - 今回はローカル環境で動作するPostgreSQLを利用するため、PostgreSQLを選択する。
@@ -95,17 +96,24 @@ root@ffe29f795685:/usr/app/packages/backend#
 - 画面上に表示されているコマンドを、そのままコピーして実行する。
 
 （ここからプログラムリスト。言語指定はなし）
-root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.2474.1
-npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
-npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+root@ffe29f795685:/usr/app/packages/backend# npm install -g @lightdash/cli@0.24
+74.1
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMExce
+ption instead
+npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaS
+cript Promise library that gave JavaScript developers strong feelings about pro
+mises. They can almost certainly migrate to the native JavaScript promise now. 
+Thank you literally everyone for joining me in this bet against the odds. Be ex
+cellent to each other.
 （以下略）
-root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8080 --token ldpat_35213b4f510ba6f2bd49104f61d35a8b
+root@ffe29f795685:/usr/app/packages/backend# lightdash login http://localhost:8
+080 --token ldpat_35213b4f510ba6f2bd49104f61d35a8b
 
-  ✅️ Login successful
+  Login successful
 
 Now you can add your first project to lightdash by doing: 
 
-  ⚡️ lightdash deploy --create
+  lightdash deploy --create
 
 Done 🕶
 root@ffe29f795685:/usr/app/packages/backend# lightdash deploy --create
@@ -125,13 +133,14 @@ Compiled 9 explores, SUCCESS=9 ERRORS=0
 
 ? Add a project name or press enter to use the default: [Demo ec]  
 
-? Do you confirm Lightdash can store your warehouse credentials so you can run queries in Lightdash? Yes
+? Do you confirm Lightdash can store your warehouse credentials so you can run 
+queries in Lightdash? Yes
 ? Do you want to save this answer for next time? Yes
-✔   New project Demo ec created
+   New project Demo ec created
 
 Successfully deployed project:
 
-      ⚡️ http://localhost:8080/createProject/cli?projectUuid=bb0c0d1b-8add-485a-9d09-9fe64345d255
+      http://localhost:8080/createProject/cli?projectUuid=bb0c0d1b-8add-485a-9d09-9fe64345d255
 
 Done 🕶
 （ここまでプログラムリスト）
