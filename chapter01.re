@@ -175,13 +175,6 @@ DWH_PGUSER=dbt_user
 DWH_PGPASSWORD=dbt_password
 DWH_PGDATABASE=dbt_warehouse
 
-# Demo用 PostgreSQL (demo-db)
-DEMO_PGHOST=demo-db
-DEMO_PGPORT=5432
-DEMO_PGUSER=demo_user
-DEMO_PGPASSWORD=demo_password
-DEMO_PGDATABASE=demo_db
-
 # Lightdash
 LIGHTDASH_SECRET=my-lightdash-secret-key-change-me
 SITE_URL=http://localhost:8080
