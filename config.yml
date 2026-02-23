@@ -3,7 +3,7 @@ booktitle: dbtに関するあれこれ（仮）
 aut: [{name: "岩下煕一", file-as: "イワシタキイチ"}, {name: "中垣健志", file-as: "ナカガキケンジ"}]
 date: 2026-04-22
 history: [["2026-04-11"]]
-rights: (C) 2026 DATUM STUDIO・ちゅらデータ技術書展支部
+rights: (C) 2026 DATUM STUDIO・ちゅらデータ技術書典支部
 texstyle: ["reviewmacro"]
 texdocumentclass: ["review-jsbook", "media=ebook,paper=b5"]
 language: ja
